@@ -1,0 +1,19 @@
+- name: Deploy app onto client VMs
+  hosts: all
+  become: true
+  tasks:
+    - name: Ensure deploy dir exists
+      file:
+        path: /opt/musicstudio
+        state: directory
+        mode: "0755"
+    - name: Copy app from shared Vagrant folder
+      ansible.builtin.copy:
+        src: /vagrant/MusicStudio/
+        dest: /opt/musicstudio/
+        remote_src: true
+
+    - name: Run docker compose up
+      command: docker compose -f docker-compose.{{inventory_hostname}}.yml up -d
+      args:
+        chdir: "/opt/musicstudio"
